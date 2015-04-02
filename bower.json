@@ -1,0 +1,45 @@
+{
+	"name": "sumi-hash",
+	"version": "1.0.0",
+	"homepage": "https://github.com/rainersu/hash",
+	"authors": [
+		{
+			"name": "Rainer Su",
+			"email": "rainersu@foxmail.com",
+			"url": "http://cn.linkedin.com/in/rainersu",
+			"qq": "2627001536"
+		}
+	],
+	"description": "A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.",
+	"main": "dist/sumi-hash.js",
+	"keywords": [
+		"hash",
+		"algorithms",
+		"MD5",
+		"SHA1",
+		"SHA3",
+		"SHA256",
+		"RMD160",
+		"Blue Midnight Wish",
+		"UUID"
+	],
+	"license": "MIT",
+	"ignore": [
+		"_",
+		"**/.*",
+		"node_modules",
+		"bower_components",
+		"/doc",
+		"/src",
+		"/doc.json",
+		"/Gruntfile.js",
+		"test",
+		"tests",
+		"logs",
+		"*.log"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/rainersu/hash.git"
+	}
+}

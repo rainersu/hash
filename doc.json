@@ -1,0 +1,42 @@
+{
+	"tags"       : {
+		"allowUnknownTags" : true
+	},
+	"plugins"   : ["plugins/markdown"],
+	"templates" : {
+		"default"   : {
+			"recurse": true,
+			"encoding": "utf8", 
+			"outputSourceFiles" : false
+		},
+		"openGraph" : {
+			"title"             : "",
+			"type"              : "website",
+			"image"             : "",
+			"site_name"         : "",
+			"url"               : ""
+		},
+		"meta"  : {
+			"title"             : "",
+			"description"       : "",
+			"keyword"           : ""
+		},
+		"cleverLinks"           : true,
+		"monospaceLinks"        : true,
+		"dateFormat"            : "ddd MMM Do YYYY",
+		"outputSourceFiles"     : false,
+		"outputSourcePath"      : false,
+		"footer"                : "",
+		"navType"               : "vertical",
+		"theme"                 : "flatly",
+		"linenums"              : true,
+		"collapseSymbols"       : true,
+		"inverseNav"            : true,
+		"highlightTutorialCode" : true,
+		"protocol"              : "fred://"
+	},
+	"markdown"  : {
+		"parser"                : "gfm",
+		"hardwrap"              : true
+	}
+}

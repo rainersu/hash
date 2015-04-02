@@ -1,0 +1,60 @@
+{
+  "name": "sumi-hash",
+  "title": "sumi-hash",
+  "version": "1.0.0",
+  "description": "A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.",
+  "main": "dist/sumi-hash.js",
+  "homepage": "https://github.com/rainersu/hash",
+  "author": {
+    "name": "Rainer Su",
+    "email": "rainersu@foxmail.com",
+    "url": "http://cn.linkedin.com/in/rainersu",
+    "qq": "2627001536"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rainersu/hash.git"
+  },
+  "keywords": [
+    "hash",
+	"algorithms",
+	"MD5",
+	"SHA1",
+	"SHA3",
+	"SHA256",
+	"RMD160",
+	"Blue Midnight Wish",
+	"UUID"
+  ],
+  "bugs": {
+    "url": "https://github.com/rainersu/hash/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/rainersu/hash/blob/master/LICENSE.md"
+    }
+  ],
+  "scripts": {
+    "build": "npm install && grunt",
+    "start": "grunt help",
+    "test": "grunt test"
+  },
+  "directories": {
+    "doc": "doc"
+  },
+  "devDependencies": {
+    "connect-livereload": ">=0.5.3",
+    "grunt": ">=0.4.5",
+    "grunt-bytesize": ">=0.1.1",
+    "grunt-contrib-clean": ">=0.6.0",
+    "grunt-contrib-connect": ">=0.9.0",
+    "grunt-contrib-uglify": ">=0.8.0",
+    "grunt-jsdoc": ">=0.6.3",
+    "grunt-umd": ">=2.3.3",
+    "grunt-update-json": ">=0.2.1",
+    "jaguarjs-jsdoc": ">=0.0.1",
+    "load-grunt-tasks": ">=3.1.0",
+    "requirejs": ">=2.1.16"
+  }  
+}
