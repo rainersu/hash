@@ -113,7 +113,7 @@ grunt.initConfig({
 		}
 	}
 });
-/*
+
 grunt.registerTask('compile',  function () {
 	var out = '';
 	grunt.file.read(MOD_SRC_PATH + '/var/index.js').split(/[\[\]]/)[1].replace(/[^-a-z0-9_,]+/ig, '').split(',').forEach(function (n) {
@@ -121,12 +121,13 @@ grunt.registerTask('compile',  function () {
 			MOD_SRC_PATH + '/var/' + n + '.js'
 		).replace(/^[^;]+\{\'use strict\'\;/, '').replace(/return\s+\w+\s*;\s*\}\);\s*$/, '');
 	});
-	grunt.file.read(MOD_SRC_PATH + '/patterns.js' ).split(/[\[\]]/)[1].replace(/[\.\'\"\s]+/ig,   '').split(',').forEach(function (n) {
-		out+= grunt.file.read(
+	var col = grunt.file.read(MOD_SRC_PATH + '/index.js' ).split(/\'use strict\'\;/);
+	col[0].split(/[\[\]]/)[1].replace(/[\.\'\"\s]+/ig,   '').split(',').forEach(function (n) {
+		if (!/var/.test(n)) out+= grunt.file.read(
 			MOD_SRC_PATH + n + '.js'
-		).replace(/^[^;]+\{\'use strict\'\;/, '').replace(/\s*\}\);\s*$/, '');
+		).replace(/^[^;]+\{\'use strict\'\;/, '').replace(/return\s+\w+\s*;\s*\}\);\s*$/, '');
 	});
-	out+= grunt.file.read(MOD_SRC_PATH + '/index.js').split(/\'use strict\'\;/)[1].replace(/\}\);\s*$/, '');
+	out+= col[1].replace(/\s*\}\);\s*$/, '');
 	grunt.file.write(MOD_DST_FILE, out);
 	grunt.log.ok('1 file created.');
 });
@@ -135,11 +136,11 @@ grunt.registerTask('showtime', function () {
 	grunt.log.ok('demo for node.js(CommonJS)...');
 	require('./' + MOD_DST_PATH + '/demo/node/index.js');
 });
-*/
+
 require("load-grunt-tasks")(grunt);
 
 grunt.registerTask('distdoc', [ /*'clean:doc', 'jsdoc'*/  ]);
-grunt.registerTask('distmod', [ /*'clean:mod', 'compile', 'umd', 'uglify',*/ 'update_json'/*, 'bytesize'*/ ]);
+grunt.registerTask('distmod', [ /*'clean:mod', */'compile', 'umd', 'uglify', 'update_json', 'bytesize' ]);
 
 grunt.registerTask('help', [ 'distdoc', 'connect:doc' ]);
 grunt.registerTask('test', [ 'distmod', 'showtime'    ]);
