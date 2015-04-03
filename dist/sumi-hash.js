@@ -25,7 +25,9 @@ A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.
     }
     var undef = undefined + "";
     var shell = typeof window !== undef ? window : typeof global !== undef ? global : this || 1;
-    var Hash = {};
+    var Hash = {
+        namespaces: ns
+    };
     var math = Math;
     var ceil = math.ceil;
     var log = math.log;
@@ -79,6 +81,9 @@ A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.
     }
     var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     var hex = [ "0123456789abcdef", "0123456789ABCDEF" ];
+    function hexCase(s) {
+        return Hash.hexCase ? s.toUpperCase() : s.toLowerCase();
+    }
     function r2e(t, e) {
         var l = t.length, d = e.length, v = array(ceil(l / 2)), f = ceil(l * 8 / (log(d) / log(2))), r = array(f), i = 0, j = v.length, o = "", q, x, u;
         for (;i < j; i++) {
@@ -157,6 +162,71 @@ A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.
         }
         return o;
     }
+    function rng() {
+        var b = array(16), t = shell.crypto || shell.msCrypto, a = shell.Uint8Array, i = 0, r;
+        t = t && t.getRandomValues;
+        if (t && a) {
+            b = new a(16);
+            t(b);
+        } else for (;i < 16; i++) {
+            if ((i & 3) === 0) r = Math.random() * 4294967296;
+            b[i] = r >>> ((i & 3) << 3) & 255;
+        }
+        return b;
+    }
+    function unparse(f) {
+        var b = [], i = 256;
+        for (;i--; ) {
+            b[i] = (i + 256).toString(16).substr(1);
+        }
+        i = 0;
+        return hexCase(b[f[i++]] + b[f[i++]] + b[f[i++]] + b[f[i++]] + "-" + b[f[i++]] + b[f[i++]] + "-" + b[f[i++]] + b[f[i++]] + "-" + b[f[i++]] + b[f[i++]] + "-" + b[f[i++]] + b[f[i++]] + b[f[i++]] + b[f[i++]] + b[f[i++]] + b[f[i++]]);
+    }
+    function uA(s, n, e, b, x) {
+        for (var i = n; i <= e; i += 2) b[x++] = parseInt(s.substr(i, 2), 16);
+    }
+    function uH(b, n, e, s, x) {
+        for (var i; n <= e; n++) {
+            i = b[n].toString(16);
+            s[x++] = "00".slice(i.length) + i;
+        }
+        return s;
+    }
+    function out(n, d, z, r) {
+        n = ns[n] || n;
+        var i = 16, u = dim(16, 0), t = "";
+        uA(n, 0, 7, u, 0);
+        uA(n, 9, 12, u, 4);
+        uA(n, 14, 17, u, 6);
+        uA(n, 19, 22, u, 8);
+        uA(n, 24, 35, u, 10);
+        for (;i--; ) t = fromCC(u[i]) + t;
+        t += d;
+        n = z(t, undefined, 2);
+        for (i = 16; i--; ) u[i] = n.charCodeAt(i);
+        u[6] &= 15;
+        u[6] |= r << 4;
+        u[8] &= 63;
+        u[8] |= 2 << 6;
+        n = array(32);
+        uH(u, 0, 3, n, 0);
+        n[8] = "-";
+        uH(u, 4, 5, n, 9);
+        n[13] = "-";
+        uH(u, 6, 7, n, 14);
+        n[18] = "-";
+        uH(u, 8, 9, n, 19);
+        n[23] = "-";
+        uH(u, 10, 15, n, 24);
+        return hexCase(n.join(""));
+    }
+    var ns = {
+        nil: "00000000-0000-0000-0000-000000000000",
+        "ns:DNS": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+        "ns:URL": "6ba7b811-9dad-11d1-80b4-00c04fd430c8",
+        "ns:OID": "6ba7b812-9dad-11d1-80b4-00c04fd430c8",
+        "ns:X500": "6ba7b814-9dad-11d1-80b4-00c04fd430c8"
+    };
     function m(q, a, b, x, s, t) {
         return add(rol(add(add(a, q), add(x, t)), s), b);
     }
@@ -644,12 +714,63 @@ A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.
         k = k != undefined ? rstr_hmac_sha512(utf16to8(k), s) : rstr_sha512(s);
         return x > 1 ? e != undefined ? r2e(k, e) : k : x > 0 ? r2b64(k) : r2hex(k);
     }
+    function uuid1(o, c, m, n) {
+        var s = rng(), e = [ s[0] | 1, s[1], s[2], s[3], s[4], s[5] ], k = (s[6] << 8 | s[7]) & 16383, x = 0, y = 0, i = 0, z = 6, b = [], t, h, d;
+        o = o || e;
+        c = c != undefined ? c : k;
+        m = m != undefined ? m : new Date().getTime();
+        n = n != undefined ? n : y + 1;
+        d = m - x + (n - y) / 1e4;
+        if (d < 0 && c == undefined) {
+            c = c + 1 & 16383;
+        }
+        if ((d < 0 || m > x) && n == undefined) {
+            n = 0;
+        }
+        if (n >= 1e4) throw new Error();
+        x = m;
+        y = n;
+        k = c;
+        m += 122192928e5;
+        t = ((m & 268435455) * 1e4 + n) % 4294967296;
+        b[i++] = t >>> 24 & 255;
+        b[i++] = t >>> 16 & 255;
+        b[i++] = t >>> 8 & 255;
+        b[i++] = t & 255;
+        h = m / 4294967296 * 1e4 & 268435455;
+        b[i++] = h >>> 8 & 255;
+        b[i++] = h & 255;
+        b[i++] = h >>> 24 & 15 | 16;
+        b[i++] = h >>> 16 & 255;
+        b[i++] = c >>> 8 | 128;
+        b[i++] = c & 255;
+        for (;z--; ) {
+            b[i + z] = o[z];
+        }
+        return unparse(b);
+    }
+    function uuid3(n, d) {
+        return out(n, d, md5, 3);
+    }
+    function uuid4(m, g) {
+        var r = m || (g || rng)();
+        r[6] = r[6] & 15 | 64;
+        r[8] = r[8] & 63 | 128;
+        return unparse(r);
+    }
+    function uuid5(n, d) {
+        return out(n, d, sha1, 5);
+    }
     shell.Hash = shell.Hash || Hash;
     return cp(Hash, {
         md5: md5,
         rmd160: rmd160,
         sha1: sha1,
         sha256: sha256,
-        sha512: sha512
+        sha512: sha512,
+        uuid1: uuid1,
+        uuid3: uuid3,
+        uuid4: uuid4,
+        uuid5: uuid5
     });
 });

@@ -21,6 +21,7 @@ define([
 	'./utf8to16LE',
 	'./b64',
 	'./hex',
+	'./hexcase',
 	'./r2e',
 	'./r2b64',
 	'./r2hex',
@@ -28,5 +29,9 @@ define([
 	'./la2r',
 	'./b2hex',
 	'./r2binb',
-	'./binb2r'
+	'./binb2r',
+	'./rng',
+	'./unparse',
+	'./out',
+	'./ns'
 ]);

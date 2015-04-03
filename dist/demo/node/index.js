@@ -71,4 +71,38 @@ for(i in col) if (col.hasOwnProperty(i)) {
 }
 console.log(out);
 
- 
+out = '\r\nUUID ver.1 :\r\n\r\n';
+var l = 3;
+for(; l--;) out+= sumiHash.uuid1() + '\r\n';
+console.log(out);
+
+out = '\r\nUUID ver.3 :\r\n\r\n';
+var col = {
+	'11a38b9a-b3da-360f-9353-a5a725514269' : 
+	[ 'ns:DNS', 'php.net' ]	
+};
+var i, n;
+var s = Array(18).join(' ');
+for(i in col) if (col.hasOwnProperty(i)) {
+	n = col[i].join(' , ');
+	out+= n + s.slice(n.length) + ' === ' + i + '   // ' + (sumiHash.uuid3.apply(null, col[i]) === i) + '\r\n';
+}
+console.log(out);
+
+out = '\r\nUUID ver.4 :\r\n\r\n';
+var l = 3;
+for(; l--;) out+= sumiHash.uuid4() + '\r\n';
+console.log(out);
+
+out = '\r\nUUID ver.5 :\r\n\r\n';
+var col = {
+	'c4a760a8-dbcf-5254-a0d9-6a4474bd1b62' : 
+	[ 'ns:DNS', 'php.net' ]	
+};
+var i, n;
+var s = Array(18).join(' ');
+for(i in col) if (col.hasOwnProperty(i)) {
+	n = col[i].join(' , ');
+	out+= n + s.slice(n.length) + ' === ' + i + '   // ' + (sumiHash.uuid5.apply(null, col[i]) === i) + '\r\n';
+}
+console.log(out);

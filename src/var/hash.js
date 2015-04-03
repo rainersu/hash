@@ -1,7 +1,13 @@
-define(function () {'use strict';
+define([
+	'./ns'
+],
+function(
+	ns
+) {'use strict';
 
-var Hash = {};
+var Hash = {
+	namespaces : ns
+};
 
 return Hash;
-
 });
