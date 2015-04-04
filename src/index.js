@@ -16,7 +16,14 @@ requirejs([
 	'./uuid1',
 	'./uuid3',
 	'./uuid4',
-	'./uuid5'
+	'./uuid5',
+	'./blake32',
+	'./bmw',
+	'./cubehash',
+	'./halfskein',
+	'./shabal',
+	'./skein',
+	'./keccak32'
 ],
 function(
 	undefined,
@@ -32,21 +39,36 @@ function(
 	uuid1,
 	uuid3,
 	uuid4,
-	uuid5
+	uuid5,
+	blake32,
+	bmw,
+	cubehash,
+	halfskein,
+	shabal,
+	skein,
+	keccak32
 ) {'use strict';
 
-shell.Hash = shell.Hash || Hash;
-return cp(Hash, {
-	md5    : md5,
-	rmd160 : rmd160,
-	sha1   : sha1,
-	sha256 : sha256,
-	sha512 : sha512,
-	sha3   : sha3,
-	uuid1  : uuid1,
-	uuid3  : uuid3,
-	uuid4  : uuid4,
-	uuid5  : uuid5
+shell.Hash = shell.Hash || Hash; cp(Hash, {
+	md5       : md5,
+	rmd160    : rmd160,
+	sha1      : sha1,
+	sha256    : sha256,
+	sha512    : sha512,
+	sha3      : sha3,
+	uuid1     : uuid1,
+	uuid3     : uuid3,
+	uuid4     : uuid4,
+	uuid5     : uuid5,
+	blake32   : blake32,
+	bmw       : bmw,
+	cubehash  : cubehash,
+	halfskein : halfskein,
+	shabal    : shabal,
+	skein     : skein,
+	keccak32  : keccak32,
+	keccak    : sha3
 });
 
+return Hash;
 });

@@ -1,7 +1,7 @@
 /*!
 sumi-hash v1.0.0
 https://github.com/rainersu/hash
-A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.
+A collection of hash algorithms. MD5, SHA1, SHA2, SHA3, RFC4122 UUID ver.1, 2, 3, 4, etc.
 (c) 2015 Rainer Su( rainersu@foxmail.com | http://cn.linkedin.com/in/rainersu | QQ: 2627001536 )
 */
 (function(root, factory) {
@@ -844,7 +844,7 @@ A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.
                 }
                 keccak_f();
             }
-            return state.array.slice(0, 4).join("");
+            return hexCase(state.array.slice(0, 4).join(""));
         };
     }();
     function uuid1(o, c, m, n) {
@@ -894,8 +894,602 @@ A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.
     function uuid5(n, d) {
         return out(n, d, sha1, 5);
     }
+    var blake32 = function() {
+        var iv;
+        var g;
+        var r;
+        var block;
+        var constants;
+        var sigma;
+        var circ;
+        var state;
+        var message;
+        var output;
+        var two32;
+        two32 = 4 * (1 << 30);
+        iv = [ 1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225 ];
+        constants = [ 608135816, 2242054355, 320440878, 57701188, 2752067618, 698298832, 137296536, 3964562569, 1160258022, 953160567, 3193202383, 887688300, 3232508343, 3380367581, 1065670069, 3041331479 ];
+        output = function(i) {
+            if (i < 0) {
+                i += two32;
+            }
+            return ("00000000" + i.toString(16)).slice(-8);
+        };
+        sigma = [ [ 16, 50, 84, 118, 152, 186, 220, 254 ], [ 174, 132, 249, 109, 193, 32, 123, 53 ], [ 139, 12, 37, 223, 234, 99, 23, 73 ], [ 151, 19, 205, 235, 98, 165, 4, 143 ], [ 9, 117, 66, 250, 30, 203, 134, 211 ], [ 194, 166, 176, 56, 212, 87, 239, 145 ], [ 92, 241, 222, 164, 112, 54, 41, 184 ], [ 189, 231, 28, 147, 5, 79, 104, 162 ], [ 246, 158, 59, 128, 44, 125, 65, 90 ], [ 42, 72, 103, 81, 191, 233, 195, 13 ] ];
+        circ = function(a, b, n) {
+            var s = state[a] ^ state[b];
+            state[a] = s >>> n | s << 32 - n;
+        };
+        g = function(i, a, b, c, d) {
+            var u = block + sigma[r][i] % 16, v = block + (sigma[r][i] >> 4);
+            a %= 4;
+            b = 4 + b % 4;
+            c = 8 + c % 4;
+            d = 12 + d % 4;
+            state[a] += state[b] + (message[u] ^ constants[v % 16]);
+            circ(d, a, 16);
+            state[c] += state[d];
+            circ(b, c, 12);
+            state[a] += state[b] + (message[v] ^ constants[u % 16]);
+            circ(d, a, 8);
+            state[c] += state[d];
+            circ(b, c, 7);
+        };
+        return function(msg, salt) {
+            if (!(salt instanceof Array && salt.length === 4)) {
+                salt = [ 0, 0, 0, 0 ];
+            }
+            var pad;
+            var chain;
+            var len;
+            var L;
+            var last_L;
+            var last;
+            var total;
+            var i;
+            chain = iv.slice(0);
+            pad = constants.slice(0, 8);
+            for (r = 0; r < 4; r += 1) {
+                pad[r] ^= salt[r];
+            }
+            len = msg.length * 16;
+            last_L = len % 512 > 446 || len % 512 === 0 ? 0 : len;
+            if (len % 512 === 432) {
+                msg += "老";
+            } else {
+                msg += "耀";
+                while (msg.length % 32 !== 27) {
+                    msg += "\x00";
+                }
+                msg += "";
+            }
+            message = [];
+            for (i = 0; i < msg.length; i += 2) {
+                message.push(msg.charCodeAt(i) * 65536 + msg.charCodeAt(i + 1));
+            }
+            message.push(0);
+            message.push(len);
+            last = message.length - 16;
+            total = 0;
+            for (block = 0; block < message.length; block += 16) {
+                total += 512;
+                L = block === last ? last_L : Math.min(len, total);
+                state = chain.concat(pad);
+                state[12] ^= L;
+                state[13] ^= L;
+                for (r = 0; r < 10; r += 1) {
+                    for (i = 0; i < 8; i += 1) {
+                        if (i < 4) {
+                            g(i, i, i, i, i);
+                        } else {
+                            g(i, i, i + 1, i + 2, i + 3);
+                        }
+                    }
+                }
+                for (i = 0; i < 8; i += 1) {
+                    chain[i] ^= salt[i % 4] ^ state[i] ^ state[i + 8];
+                }
+            }
+            return hexCase(chain.map(output).join(""));
+        };
+    }();
+    var bmw = function() {
+        var iv, final, u, add_const, sc, fc, ec_s, ec_n, ec2_rot, hex, output_fn, compress, rot, s, fold;
+        hex = function(n) {
+            return ("00" + n.toString(16)).slice(-2);
+        };
+        output_fn = function(n) {
+            return hex(n & 255) + hex(n >>> 8) + hex(n >>> 16) + hex(n >>> 24);
+        };
+        iv = [];
+        final = [];
+        add_const = [];
+        for (u = 0; u < 16; u += 1) {
+            final[u] = 2863311520 + u;
+            iv[u] = 1078018627 + u * 67372036;
+            add_const[u] = (u + 16) * 89478485;
+        }
+        rot = function(x, n) {
+            return (x << n) + (x >>> 32 - n);
+        };
+        sc = [ 19, 23, 25, 29, 4, 8, 12, 15, 3, 2, 1, 2, 1, 1, 2, 2 ];
+        s = function(x, n) {
+            return n < 4 ? rot(x, sc[n]) ^ rot(x, sc[n + 4]) ^ x << sc[n + 8] ^ x >>> sc[n + 12] : x ^ x >>> n - 3;
+        };
+        fc = [ 21, 7, 5, 1, 3, 22, 4, 11, 24, 6, 22, 20, 3, 4, 7, 2, 5, 24, 21, 21, 16, 6, 22, 18 ];
+        fold = function(x, n) {
+            n = fc[n];
+            return n < 16 ? x >>> n : x << n - 16;
+        };
+        ec_s = [ 29, 13, 27, 13, 25, 21, 18, 4, 5, 11, 17, 24, 19, 31, 5, 24 ];
+        ec_n = [ 5, 7, 10, 13, 14 ];
+        ec2_rot = [ 0, 3, 7, 13, 16, 19, 23, 27 ];
+        compress = function(m, H) {
+            var lo, hi, i, j, k, a, b, Q;
+            Q = [];
+            for (i = 0; i < 16; i += 1) {
+                a = 0;
+                for (j = 0; j < 5; j += 1) {
+                    k = (i + ec_n[j]) % 16;
+                    b = H[k] ^ m[k];
+                    a += (ec_s[i] >> j) % 2 ? b : -b;
+                }
+                Q[i] = H[(i + 1) % 16] + s(a, i % 5);
+            }
+            for (i = 0; i < 16; i += 1) {
+                a = (i + 3) % 16;
+                b = (i + 10) % 16;
+                Q[i + 16] = H[(i + 7) % 16] ^ add_const[i] + rot(m[i], 1 + i) + rot(m[a], 1 + a) - rot(m[b], 1 + b);
+                for (k = 1; k < 17; k += 1) {
+                    a = Q[i + k - 1];
+                    Q[i + 16] += i < 2 ? s(a, k % 4) : k > 14 ? s(a, k - 11) : k % 2 ? a : rot(a, ec2_rot[k / 2]);
+                }
+            }
+            lo = hi = 0;
+            for (i = 16; i < 24; i += 1) {
+                lo ^= Q[i];
+                hi ^= Q[i + 8];
+            }
+            hi ^= lo;
+            for (i = 0; i < 16; i += 1) {
+                H[i] = i < 8 ? (lo ^ Q[i] ^ Q[i + 24]) + (m[i] ^ fold(hi, i) ^ fold(Q[i + 16], i + 16)) : (hi ^ m[i] ^ Q[i + 16]) + (Q[i] ^ fold(lo, i) ^ Q[16 + (i - 1) % 8]) + rot(H[(i - 4) % 8], i + 1);
+            }
+            return H;
+        };
+        return function(msg) {
+            var len, i, data, H;
+            len = 16 * msg.length;
+            msg += "";
+            while (msg.length % 32 !== 28) {
+                msg += "\x00";
+            }
+            data = [];
+            for (i = 0; i < msg.length; i += 2) {
+                data.push(msg.charCodeAt(i) + 65536 * msg.charCodeAt(i + 1));
+            }
+            data.push(len);
+            data.push(0);
+            H = iv.slice(0);
+            for (i = 0; i < data.length; i += 16) {
+                compress(data.slice(i, i + 16), H);
+            }
+            return hexCase(compress(H, final.slice(0)).slice(8, 16).map(output_fn).join(""));
+        };
+    }();
+    var cubehash = function() {
+        var state, round, input, initial_state, out_length, tmp, i, j, r, plus_rotate, swap_xor_swap, hex, output_fn;
+        out_length = 256;
+        state = [ out_length / 8, 32, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+        plus_rotate = function(r, s) {
+            for (i = 0; i < 16; i += 1) {
+                state[16 + i] += state[i];
+                state[i] = state[i] << r ^ state[i] >>> s;
+            }
+        };
+        swap_xor_swap = function(mask1, mask2) {
+            for (i = 0; i < 16; i += 1) {
+                if (i & mask1) {
+                    j = i ^ mask1;
+                    tmp = state[i] ^ state[j + 16];
+                    state[i] = state[j] ^ state[i + 16];
+                    state[j] = tmp;
+                }
+            }
+            for (i = 16; i < 32; i += 1) {
+                if (i & mask2) {
+                    j = i ^ mask2;
+                    tmp = state[i];
+                    state[i] = state[j];
+                    state[j] = tmp;
+                }
+            }
+        };
+        round = function(n) {
+            n *= 16;
+            for (r = 0; r < n; r += 1) {
+                plus_rotate(7, 25);
+                swap_xor_swap(8, 2);
+                plus_rotate(11, 21);
+                swap_xor_swap(4, 1);
+            }
+        };
+        round(10);
+        initial_state = state.slice(0);
+        hex = function(n) {
+            return ("00" + n.toString(16)).slice(-2);
+        };
+        output_fn = function(n) {
+            return hex(n & 255) + hex(n >>> 8) + hex(n >>> 16) + hex(n >>> 24);
+        };
+        return function(str) {
+            var block, i;
+            state = initial_state.slice(0);
+            str += "";
+            while (str.length % 16 > 0) {
+                str += "\x00";
+            }
+            input = [];
+            for (i = 0; i < str.length; i += 2) {
+                input.push(str.charCodeAt(i) + str.charCodeAt(i + 1) * 65536);
+            }
+            for (block = 0; block < input.length; block += 8) {
+                for (i = 0; i < 8; i += 1) {
+                    state[i] ^= input[block + i];
+                }
+                round(1);
+            }
+            state[31] ^= 1;
+            round(10);
+            return hexCase(state.map(output_fn).join("").substring(0, out_length / 4));
+        };
+    }();
+    var halfskein = function() {
+        var even, odd, charcode, zero, pad, rot, ubi, initial, state, mix, hex, output_fn, subkey_inject;
+        even = [ 0, 2, 4, 6, 2, 4, 6, 0, 4, 6, 0, 2, 6, 0, 2, 4 ];
+        odd = [ 1, 3, 5, 7, 1, 7, 5, 3, 1, 3, 5, 7, 1, 7, 5, 3 ];
+        charcode = String.fromCharCode;
+        zero = charcode(0);
+        pad = zero + zero + zero + zero;
+        pad += pad + pad + pad;
+        rot = [ [ 5, 16, 17, 10, 11, 9, 7, 25, 6, 12, 20, 28, 17, 12, 6, 25 ], [ 24, 2, 2, 21, 17, 15, 13, 11, 21, 12, 4, 22, 15, 23, 18, 5 ] ];
+        subkey_inject = function(key, tweak, round) {
+            for (var i = 0; i < 8; i += 1) {
+                state[i] += key[(round + i) % 9];
+            }
+            state[5] += tweak[round % 5];
+            state[6] += tweak[(round + 1) % 5];
+            state[7] += round;
+        };
+        mix = function(r) {
+            var a, b, i;
+            for (i = 0; i < 16; i += 1) {
+                a = even[i];
+                b = odd[i];
+                state[a] += state[b];
+                state[b] = state[a] ^ (state[b] << r[i] | state[b] >>> 32 - r[i]);
+            }
+        };
+        ubi = function(type, message) {
+            var key, data, i, j, block, round, first, last, tweak, original_length;
+            original_length = message.length;
+            if (original_length % 16) {
+                message += pad.slice(original_length % 16);
+            } else if (original_length === 0) {
+                message = pad;
+            }
+            data = [];
+            j = 0;
+            for (i = 0; i < message.length; i += 2) {
+                data[j] = message.charCodeAt(i) + message.charCodeAt(i + 1) * 65536;
+                j += 1;
+            }
+            first = 1 << 30;
+            type <<= 24;
+            last = data.length - 8;
+            for (block = 0; block <= last; block += 8) {
+                tweak = block === last ? [ 2 * original_length, 0, 0, first + type + (1 << 31) ] : [ 4 * block + 32, 0, 0, first + type ];
+                tweak[4] = tweak[0] ^ tweak[3];
+                key = state;
+                key[8] = 1431655765;
+                for (i = 0; i < 8; i += 1) {
+                    key[8] ^= key[i];
+                }
+                state = data.slice(block, block + 8);
+                for (round = 0; round < 18; round += 1) {
+                    subkey_inject(key, tweak, round);
+                    mix(rot[round % 2]);
+                }
+                subkey_inject(key, tweak, round);
+                for (i = 0; i < 8; i += 1) {
+                    state[i] ^= data[block + i];
+                }
+                first = 0;
+            }
+        };
+        hex = function(n) {
+            return ("00" + n.toString(16)).slice(-2);
+        };
+        output_fn = function(n) {
+            return hex(n & 255) + hex(n >>> 8) + hex(n >>> 16) + hex(n >>> 24);
+        };
+        state = [ 0, 0, 0, 0, 0, 0, 0, 0 ];
+        ubi(4, charcode(21352, 28267, 1, 0, 256) + pad.slice(5));
+        initial = state;
+        return function(m) {
+            state = initial.slice(0);
+            ubi(48, m);
+            ubi(63, zero + zero + zero + zero);
+            return hexCase(state.map(output_fn).join(""));
+        };
+    }();
+    var shabal = function() {
+        var A, B, C, M, circ, shabal_f, ivA, ivB, ivC, z, hex, output_fn;
+        circ = function(x, n) {
+            return (x << n) + (x >>> 32 - n);
+        };
+        hex = function(n) {
+            return ("00" + n.toString(16)).slice(-2);
+        };
+        output_fn = function(n) {
+            return hex(n & 255) + hex(n >>> 8) + hex(n >>> 16) + hex(n >>> 24);
+        };
+        shabal_f = function(start, w0, w1) {
+            var i, j, k;
+            for (i = 0; i < 16; i += 1) {
+                B[i] = circ(B[i] + M[start + i], 17);
+            }
+            A[0] ^= w0;
+            A[1] ^= w1;
+            for (j = 0; j < 3; j += 1) {
+                for (i = 0; i < 16; i += 1) {
+                    k = (i + 16 * j) % 12;
+                    A[k] = 3 * (A[k] ^ 5 * circ(A[(k + 11) % 12], 15) ^ C[(24 - i) % 16]) ^ B[(i + 13) % 16] ^ B[(i + 9) % 16] & ~B[(i + 6) % 16] ^ M[start + i];
+                    B[i] = circ(B[i], 1) ^ ~A[k];
+                }
+            }
+            for (j = 0; j < 36; j += 1) {
+                A[j % 12] += C[(j + 3) % 16];
+            }
+            for (i = 0; i < 16; i += 1) {
+                C[i] -= M[start + i];
+            }
+            k = B;
+            B = C;
+            C = k;
+        };
+        B = [];
+        C = [];
+        M = [];
+        for (z = 0; z < 16; z += 1) {
+            B[z] = C[z] = 0;
+            M[z] = 256 + z;
+            M[z + 16] = 272 + z;
+        }
+        A = B.slice(4);
+        shabal_f(0, -1, -1);
+        shabal_f(16, 0, 0);
+        ivA = A;
+        ivB = B;
+        ivC = C;
+        return function(msg) {
+            var i, j = 0;
+            A = ivA.slice(0);
+            B = ivB.slice(0);
+            C = ivC.slice(0);
+            msg += "";
+            while (msg.length % 32) {
+                msg += "\x00";
+            }
+            M = [];
+            for (i = 0; i < msg.length; i += 2) {
+                M.push(msg.charCodeAt(i) + 65536 * msg.charCodeAt(i + 1));
+            }
+            for (i = 0; i < M.length; i += 16) {
+                j += 1;
+                shabal_f(i, j, 0);
+            }
+            i -= 16;
+            shabal_f(i, j, 0);
+            shabal_f(i, j, 0);
+            shabal_f(i, j, 0);
+            return hexCase(C.slice(8, 16).map(output_fn).join(""));
+        };
+    }();
+    var skein = function() {
+        var even, odd, charcode, zero, pad, rot, ubi, initial, state, mix, subkey_inject, L;
+        L = function(lo, hi) {
+            this.lo = lo ? lo : 0;
+            this.hi = hi ? hi : 0;
+        };
+        L.clone = function(a) {
+            return new L(a.lo, a.hi);
+        };
+        L.prototype = {
+            xor: function(that) {
+                this.lo ^= that.lo;
+                this.hi ^= that.hi;
+                return this;
+            },
+            plus: function() {
+                var two32, s;
+                two32 = 4 * (1 << 30);
+                s = function(x, y) {
+                    var t = x + y;
+                    if (x < 0) {
+                        t += two32;
+                    }
+                    if (y < 0) {
+                        t += two32;
+                    }
+                    return t;
+                };
+                return function(that) {
+                    this.lo = s(this.lo, that.lo);
+                    this.hi = (s(this.hi, that.hi) + (this.lo >= two32 ? 1 : 0)) % two32;
+                    this.lo = this.lo % two32;
+                    return this;
+                };
+            }(),
+            circ: function(n) {
+                var tmp, m;
+                if (n >= 32) {
+                    tmp = this.lo;
+                    this.lo = this.hi;
+                    this.hi = tmp;
+                    n -= 32;
+                }
+                m = 32 - n;
+                tmp = (this.hi << n) + (this.lo >>> m);
+                this.lo = (this.lo << n) + (this.hi >>> m);
+                this.hi = tmp;
+                return this;
+            },
+            toString: function() {
+                var hex, o;
+                hex = function(n) {
+                    return ("00" + n.toString(16)).slice(-2);
+                };
+                o = function(n) {
+                    return hex(n & 255) + hex(n >>> 8) + hex(n >>> 16) + hex(n >>> 24);
+                };
+                return function() {
+                    return o(this.lo) + o(this.hi);
+                };
+            }()
+        };
+        even = [ 0, 2, 4, 6, 2, 4, 6, 0, 4, 6, 0, 2, 6, 0, 2, 4 ];
+        odd = [ 1, 3, 5, 7, 1, 7, 5, 3, 1, 3, 5, 7, 1, 7, 5, 3 ];
+        charcode = String.fromCharCode;
+        zero = charcode(0);
+        pad = zero + zero + zero + zero;
+        pad += pad + pad + pad;
+        pad += pad;
+        rot = [ [ 46, 36, 19, 37, 33, 27, 14, 42, 17, 49, 36, 39, 44, 9, 54, 56 ], [ 39, 30, 34, 24, 13, 50, 10, 17, 25, 29, 39, 43, 8, 35, 56, 22 ] ];
+        subkey_inject = function(key, tweak, round) {
+            for (var i = 0; i < 8; i += 1) {
+                state[i].plus(key[(round + i) % 9]);
+            }
+            state[5].plus(tweak[round % 3]);
+            state[6].plus(tweak[(round + 1) % 3]);
+            state[7].plus(new L(round));
+        };
+        mix = function(r) {
+            var a, b, i;
+            for (i = 0; i < 16; i += 1) {
+                a = even[i];
+                b = odd[i];
+                state[a].plus(state[b]);
+                state[b].circ(r[i]).xor(state[a]);
+            }
+        };
+        ubi = function(type, message) {
+            var key, data, i, j, block, round, first, last, tweak, original_length;
+            original_length = message.length;
+            if (original_length % 32) {
+                message += pad.slice(original_length % 32);
+            } else if (original_length === 0) {
+                message = pad;
+            }
+            data = [];
+            j = 0;
+            for (i = 0; i < message.length; i += 4) {
+                data[j] = new L(message.charCodeAt(i) + message.charCodeAt(i + 1) * 65536, message.charCodeAt(i + 2) + message.charCodeAt(i + 3) * 65536);
+                j += 1;
+            }
+            first = 1 << 30;
+            type <<= 24;
+            last = data.length - 8;
+            for (block = 0; block <= last; block += 8) {
+                tweak = block === last ? [ new L(2 * original_length), new L(0, first + type + (1 << 31)) ] : [ new L(8 * block + 64), new L(0, first + type) ];
+                tweak[2] = new L().xor(tweak[0]).xor(tweak[1]);
+                key = state;
+                key[8] = new L(2851871266, 466688986);
+                for (i = 0; i < 8; i += 1) {
+                    key[8].xor(key[i]);
+                }
+                state = data.slice(block, block + 8).map(L.clone);
+                for (round = 0; round < 18; round += 1) {
+                    subkey_inject(key, tweak, round);
+                    mix(rot[round % 2]);
+                }
+                subkey_inject(key, tweak, round);
+                for (i = 0; i < 8; i += 1) {
+                    state[i].xor(data[block + i]);
+                }
+                first = 0;
+            }
+        };
+        state = [ new L(), new L(), new L(), new L(), new L(), new L(), new L(), new L() ];
+        ubi(4, charcode(18515, 13121, 1, 0, 512) + pad.slice(5, 16));
+        initial = state;
+        return function(m) {
+            state = initial.map(L.clone);
+            ubi(48, m);
+            ubi(63, zero + zero + zero + zero);
+            return hexCase(state.join(""));
+        };
+    }();
+    var keccak32 = function() {
+        var permute, RC, r, circ, hex, output_fn;
+        permute = [ 0, 10, 20, 5, 15, 16, 1, 11, 21, 6, 7, 17, 2, 12, 22, 23, 8, 18, 3, 13, 14, 24, 9, 19, 4 ];
+        RC = "1,8082,808a,80008000,808b,80000001,80008081,8009,8a,88,80008009,8000000a,8000808b,8b,8089,8003,8002,80,800a,8000000a,80008081,8080".split(",").map(function(i) {
+            return parseInt(i, 16);
+        });
+        r = [ 0, 1, 30, 28, 27, 4, 12, 6, 23, 20, 3, 10, 11, 25, 7, 9, 13, 15, 21, 8, 18, 2, 29, 24, 14 ];
+        circ = function(s, n) {
+            return s << n | s >>> 32 - n;
+        };
+        hex = function(n) {
+            return ("00" + n.toString(16)).slice(-2);
+        };
+        output_fn = function(n) {
+            return hex(n & 255) + hex(n >>> 8) + hex(n >>> 16) + hex(n >>> 24);
+        };
+        return function(m) {
+            var i, b, k, x, y, C, D, round, next, state;
+            state = [];
+            for (i = 0; i < 25; i += 1) {
+                state[i] = 0;
+            }
+            C = [];
+            D = [];
+            next = [];
+            if (m.length % 16 === 15) {
+                m += "老";
+            } else {
+                m += "";
+                while (m.length % 16 !== 15) {
+                    m += "\x00";
+                }
+                m += "耀";
+            }
+            for (b = 0; b < m.length; b += 16) {
+                for (k = 0; k < 16; k += 2) {
+                    state[k / 2] ^= m.charCodeAt(b + k) + m.charCodeAt(b + k + 1) * 65536;
+                }
+                for (round = 0; round < 22; round += 1) {
+                    for (x = 0; x < 5; x += 1) {
+                        C[x] = state[x] ^ state[x + 5] ^ state[x + 10] ^ state[x + 15] ^ state[x + 20];
+                    }
+                    for (x = 0; x < 5; x += 1) {
+                        D[x] = C[(x + 4) % 5] ^ circ(C[(x + 1) % 5], 1);
+                    }
+                    for (i = 0; i < 25; i += 1) {
+                        next[permute[i]] = circ(state[i] ^ D[i % 5], r[i]);
+                    }
+                    for (x = 0; x < 5; x += 1) {
+                        for (y = 0; y < 25; y += 5) {
+                            state[y + x] = next[y + x] ^ ~next[y + (x + 1) % 5] & next[y + (x + 2) % 5];
+                        }
+                    }
+                    state[0] ^= RC[round];
+                }
+            }
+            return hexCase(state.slice(0, 8).map(output_fn).join(""));
+        };
+    }();
     shell.Hash = shell.Hash || Hash;
-    return cp(Hash, {
+    cp(Hash, {
         md5: md5,
         rmd160: rmd160,
         sha1: sha1,
@@ -905,6 +1499,15 @@ A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.
         uuid1: uuid1,
         uuid3: uuid3,
         uuid4: uuid4,
-        uuid5: uuid5
+        uuid5: uuid5,
+        blake32: blake32,
+        bmw: bmw,
+        cubehash: cubehash,
+        halfskein: halfskein,
+        shabal: shabal,
+        skein: skein,
+        keccak32: keccak32,
+        keccak: sha3
     });
+    return Hash;
 });

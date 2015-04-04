@@ -1,5 +1,5 @@
 # [sumi-hash](https://www.npmjs.com/package/sumi-hash)
-A collection of hash algorithms. MD5, SHA1, SHA3, SHA256, RMD160, UUID version 1, 3, 4, 5, bla bla etc. Stand alone mod, no dependencies.
+A collection of hash algorithms. MD5, RIPEMD-160, SHA-1, SHA-2, SHA-3, RFC4122 UUID version 1, 3, 4, 5, bla bla etc. Stand alone mod, no dependencies.
 
 Target environments
 -------------------
@@ -11,7 +11,63 @@ Target environments
 Features
 --------
 
-- It has no dependencies. The entire set of modules clocks in at ` 9kb ` minified and gzipped. 
+- RFC4122 UUID version 1, 2, 3, 4.
+- MD5, RIPEMD-160.
+- SHA-1, SHA2-256, SHA2-512, SHA3-256(Keccak).
+- BLAKE, Blue Midnight Wish, CubeHash, Shabal, Skein, etc.
+- It has no dependencies. The entire set of modules clocks in at ` 12kb ` minified and gzipped. 
+
+Quick start
+-----------
+
+Four quick start options are available:
+
+- [Download the latest release](https://github.com/rainersu/hash/archive/v1.0.0.zip)
+- Clone the repo: `git clone https://github.com/rainersu/hash.git`
+- Install with [Bower](http://bower.io): `bower install sumi-hash`
+- Install with [npm](https://www.npmjs.com): `npm install sumi-hash`
+
+Example use
+-----------
+
+Including in a browser:
+
+```html
+<script type='text/javascript' src='/path/to/sumi-hash-1.0.0.min.js'></script>
+<script type='text/javascript'>
+console.log(sumiHash.md5('abs', 'key'));
+</script>
+```
+
+As a module that works with AMD(e.g., [RequireJS](http://requirejs.org/)):
+
+```bash
+define(['/path/to/sumi-hash-1.0.0.min.js'], function(Hash) {
+	console.log(Hash.sha3('admin@me.com'));
+});
+```
+
+Including in a CommonJS environment(e.g., [Node.js](https://nodejs.org/)):
+
+```bash
+var Hash = require('/path/to/sumi-hash');
+console.log(Hash.uuid3('ns:DNS', 'php.net'));
+```
+
+Build from source
+-----------------
+
+First, you need to have [Node.js](https://nodejs.org/) and [Grunt](http://gruntjs.com/) installed.
+
+```bash
+$ git clone git@github.com:rainersu/hash.git
+$ npm install -g grunt-cli
+$ cd hash
+$ npm install
+$ grunt
+```
+
+It provides compiled JS (`sumi-hash.*`), as well as compiled and minified JS (`sumi-hash.min.*`). JS [source maps](https://developers.google.com/chrome-developer-tools/docs/css-preprocessors) (`sumi-hash.*.map`) are available for use with certain browsers' developer tools.
 
 Running demos for testing
 -------------------------

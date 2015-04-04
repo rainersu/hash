@@ -2,7 +2,7 @@
   "name": "sumi-hash",
   "title": "sumi-hash",
   "version": "1.0.0",
-  "description": "A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.",
+  "description": "A collection of hash algorithms. MD5, SHA1, SHA2, SHA3, RFC4122 UUID ver.1, 2, 3, 4, etc.",
   "main": "dist/sumi-hash.js",
   "homepage": "https://github.com/rainersu/hash",
   "author": {

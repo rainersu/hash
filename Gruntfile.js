@@ -139,8 +139,8 @@ grunt.registerTask('showtime', function () {
 
 require("load-grunt-tasks")(grunt);
 
-grunt.registerTask('distdoc', [ /*'clean:doc', 'jsdoc'*/  ]);
-grunt.registerTask('distmod', [ /*'clean:mod', */'compile', 'umd', 'uglify', 'update_json', 'bytesize' ]);
+grunt.registerTask('distdoc', [ 'clean:doc', 'jsdoc'  ]);
+grunt.registerTask('distmod', [ 'clean:mod', 'compile', 'umd', 'uglify', 'update_json', 'bytesize' ]);
 
 grunt.registerTask('help', [ 'distdoc', 'connect:doc' ]);
 grunt.registerTask('test', [ 'distmod', 'showtime'    ]);

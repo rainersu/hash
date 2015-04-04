@@ -10,7 +10,7 @@
 			"qq": "2627001536"
 		}
 	],
-	"description": "A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.",
+	"description": "A collection of hash algorithms. MD5, SHA1, SHA2, SHA3, RFC4122 UUID ver.1, 2, 3, 4, etc.",
 	"main": "dist/sumi-hash.js",
 	"keywords": [
 		"hash",

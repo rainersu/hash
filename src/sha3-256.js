@@ -1,4 +1,11 @@
-define(function () {'use strict';
+define([
+	'./var/undefined',
+	'./var/hexCase'
+],
+function(
+	undefined,
+	hexCase
+) {'use strict';
 
 var sha3 = (function () {
 	var state, State, L, permute, zeros, RC, r, keccak_f;
@@ -145,7 +152,7 @@ var sha3 = (function () {
 			}
 			keccak_f();
 		}
-		return state.array.slice(0, 4).join("");
+		return hexCase(state.array.slice(0, 4).join(""));
 	};
 }());
 
