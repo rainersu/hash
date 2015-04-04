@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Hash by rainersu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Hash</h1>
+      <h2 class="project-tagline">A collection of hash algorithms and also with RFC4122 UUID version 1, 3, 4, 5.</h2>
+      <a href="https://github.com/rainersu/hash" class="btn">View on GitHub</a>
+      <a href="https://github.com/rainersu/hash/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/rainersu/hash/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="sumi-hash" class="anchor" href="#sumi-hash" aria-hidden="true"><span class="octicon octicon-link"></span></a><a href="https://www.npmjs.com/package/sumi-hash">sumi-hash</a>
+</h1>
+
+<p>A collection of hash algorithms. MD5, RIPEMD-160, SHA-1, SHA-2, SHA-3, RFC4122 UUID version 1, 3, 4, 5, bla bla etc. Stand alone mod, no dependencies.</p>
+
+<h2>
+<a id="target-environments" class="anchor" href="#target-environments" aria-hidden="true"><span class="octicon octicon-link"></span></a>Target environments</h2>
+
+<ul>
+<li>IE 6+</li>
+<li>Latest Stable: Firefox, Chrome, Safari, Opera</li>
+<li>
+<a href="https://nodejs.org/">Node.js</a> &amp; other non-browser environments or browser extensions</li>
+</ul>
+
+<h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>RFC4122 UUID version 1, 2, 3, 4.</li>
+<li>MD5, RIPEMD-160.</li>
+<li>SHA-1, SHA2-256, SHA2-512, SHA3-256(Keccak).</li>
+<li>BLAKE, Blue Midnight Wish, CubeHash, Shabal, Skein, etc.</li>
+<li>It has no dependencies. The entire set of modules clocks in at <code>12kb</code> minified and gzipped. </li>
+</ul>
+
+<h2>
+<a id="quick-start" class="anchor" href="#quick-start" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick start</h2>
+
+<p>Four quick start options are available:</p>
+
+<ul>
+<li><a href="https://github.com/rainersu/hash/archive/v1.0.0.zip">Download the latest release</a></li>
+<li>Clone the repo: <code>git clone https://github.com/rainersu/hash.git</code>
+</li>
+<li>Install with <a href="http://bower.io">Bower</a>: <code>bower install sumi-hash</code>
+</li>
+<li>Install with <a href="https://www.npmjs.com">npm</a>: <code>npm install sumi-hash</code>
+</li>
+</ul>
+
+<h2>
+<a id="example-use" class="anchor" href="#example-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example use</h2>
+
+<p>Including in a browser:</p>
+
+<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">script</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">'</span>text/javascript<span class="pl-pds">'</span></span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">'</span>/path/to/sumi-hash-1.0.0.min.js<span class="pl-pds">'</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
+<span class="pl-s1">&lt;<span class="pl-ent">script</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">'</span>text/javascript<span class="pl-pds">'</span></span>&gt;</span>
+<span class="pl-s1"><span class="pl-en">console</span><span class="pl-c1">.log</span>(sumiHash.md5(<span class="pl-s"><span class="pl-pds">'</span>abs<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>key<span class="pl-pds">'</span></span>));</span>
+<span class="pl-s1">&lt;/<span class="pl-ent">script</span>&gt;</span></pre></div>
+
+<p>As a module that works with AMD(e.g., <a href="http://requirejs.org/">RequireJS</a>):</p>
+
+<div class="highlight highlight-bash"><pre>define([<span class="pl-s"><span class="pl-pds">'</span>/path/to/sumi-hash-1.0.0.min.js<span class="pl-pds">'</span></span>], function(Hash) {
+    console.log(Hash.sha3(<span class="pl-s"><span class="pl-pds">'</span>admin@me.com<span class="pl-pds">'</span></span>))<span class="pl-k">;</span>
+})<span class="pl-k">;</span></pre></div>
+
+<p>Including in a CommonJS environment(e.g., <a href="https://nodejs.org/">Node.js</a>):</p>
+
+<div class="highlight highlight-bash"><pre>var Hash = require(<span class="pl-s"><span class="pl-pds">'</span>/path/to/sumi-hash<span class="pl-pds">'</span></span>)<span class="pl-k">;</span>
+console.log(Hash.uuid3(<span class="pl-s"><span class="pl-pds">'</span>ns:DNS<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>php.net<span class="pl-pds">'</span></span>))<span class="pl-k">;</span></pre></div>
+
+<h2>
+<a id="build-from-source" class="anchor" href="#build-from-source" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build from source</h2>
+
+<p>First, you need to have <a href="https://nodejs.org/">Node.js</a> and <a href="http://gruntjs.com/">Grunt</a> installed.</p>
+
+<div class="highlight highlight-bash"><pre>$ git clone git@github.com:rainersu/hash.git
+$ npm install -g grunt-cli
+$ <span class="pl-c1">cd</span> <span class="pl-c1">hash</span>
+$ npm install
+$ grunt</pre></div>
+
+<p>It provides compiled JS (<code>sumi-hash.*</code>), as well as compiled and minified JS (<code>sumi-hash.min.*</code>). JS <a href="https://developers.google.com/chrome-developer-tools/docs/css-preprocessors">source maps</a> (<code>sumi-hash.*.map</code>) are available for use with certain browsers' developer tools.</p>
+
+<h2>
+<a id="running-demos-for-testing" class="anchor" href="#running-demos-for-testing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running demos for testing</h2>
+
+<div class="highlight highlight-bash"><pre>$ grunt <span class="pl-c1">test</span></pre></div>
+
+<h2>
+<a id="build--running-documentation-locally" class="anchor" href="#build--running-documentation-locally" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build &amp; running documentation locally</h2>
+
+<div class="highlight highlight-bash"><pre>$ grunt <span class="pl-c1">help</span></pre></div>
+
+<p>Sorry, the documentation is currently offered only in the Chinese language. Do you have time to help me with some Chinese - English translations?</p>
+
+<h2>
+<a id="how-to-contact-me" class="anchor" href="#how-to-contact-me" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to contact me</h2>
+
+<ul>
+<li><a href="mailto:rainersu@foxmail.com">rainersu@foxmail.com</a></li>
+<li><a href="http://cn.linkedin.com/in/rainersu">http://cn.linkedin.com/in/rainersu</a></li>
+<li><a href="http://site.douban.com/185696/">http://site.douban.com/185696/</a></li>
+<li><a href="http://rainersu.github.io">http://rainersu.github.io</a></li>
+<li><code>QQ: 2627001536</code></li>
+</ul>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/rainersu/hash">Hash</a> is maintained by <a href="https://github.com/rainersu">rainersu</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
