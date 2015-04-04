@@ -18,5 +18,4 @@ function utf8to16LE (i) {
 }
 
 return utf8to16LE;
-
 });

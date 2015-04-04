@@ -120,10 +120,8 @@ function binl_rmd160 (x, len) {
 function rstr_rmd160 (s) {
 	return la2r(binl_rmd160(r2la(s), s.length * 8));
 }
-function rstr_hmac_rmd160 (key, data) {
-	var k = key,
-		d = data,
-		b = r2la(k),
+function rstr_hmac_rmd160 (k, d) {
+	var b = r2la(k),
 		p = array(16), 
 		o = array(16),
 		i = 0,
@@ -137,9 +135,8 @@ function rstr_hmac_rmd160 (key, data) {
 	return la2r(binl_rmd160(o.concat(binl_rmd160(p.concat(r2la(d)), 512 + d.length * 8)), 512 + 160));
 }
 
-function rmd160 (s, k, x, e) {
-	k = k != undefined ? rstr_hmac_rmd160(utf16to8(k), s) : rstr_rmd160(s);
-	return x > 1 ? (e != undefined ? r2e(k, e) : k) : x > 0 ? r2b64(k) : r2hex(k);
+function rmd160 (s, k) {
+	return r2hex(k != undefined ? rstr_hmac_rmd160(utf16to8(k), s) : rstr_rmd160(s));
 }
 
 return rmd160;

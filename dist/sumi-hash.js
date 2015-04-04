@@ -399,8 +399,8 @@ A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.
     function rstr_rmd160(s) {
         return la2r(binl_rmd160(r2la(s), s.length * 8));
     }
-    function rstr_hmac_rmd160(key, data) {
-        var k = key, d = data, b = r2la(k), p = array(16), o = array(16), i = 0, x;
+    function rstr_hmac_rmd160(k, d) {
+        var b = r2la(k), p = array(16), o = array(16), i = 0, x;
         if (b.length > 16) b = binl_rmd160(b, k.length * 8);
         for (;i < 16; i++) {
             x = b[i];
@@ -409,9 +409,8 @@ A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.
         }
         return la2r(binl_rmd160(o.concat(binl_rmd160(p.concat(r2la(d)), 512 + d.length * 8)), 512 + 160));
     }
-    function rmd160(s, k, x, e) {
-        k = k != undefined ? rstr_hmac_rmd160(utf16to8(k), s) : rstr_rmd160(s);
-        return x > 1 ? e != undefined ? r2e(k, e) : k : x > 0 ? r2b64(k) : r2hex(k);
+    function rmd160(s, k) {
+        return r2hex(k != undefined ? rstr_hmac_rmd160(utf16to8(k), s) : rstr_rmd160(s));
     }
     var b64pad = "", chrsz = 8;
     function binb2str(b) {
@@ -714,6 +713,140 @@ A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.
         k = k != undefined ? rstr_hmac_sha512(utf16to8(k), s) : rstr_sha512(s);
         return x > 1 ? e != undefined ? r2e(k, e) : k : x > 0 ? r2b64(k) : r2hex(k);
     }
+    var sha3 = function() {
+        var state, State, L, permute, zeros, RC, r, keccak_f;
+        L = function(lo, hi) {
+            this.lo = lo ? lo : 0;
+            this.hi = hi ? hi : 0;
+        };
+        L.clone = function(a) {
+            return new L(a.lo, a.hi);
+        };
+        L.prototype = {
+            xor: function(that) {
+                this.lo ^= that.lo;
+                this.hi ^= that.hi;
+                return this;
+            },
+            not: function() {
+                return new L(~this.lo, ~this.hi);
+            },
+            and: function(that) {
+                this.lo &= that.lo;
+                this.hi &= that.hi;
+                return this;
+            },
+            circ: function(n) {
+                var tmp, m;
+                if (n >= 32) {
+                    tmp = this.lo;
+                    this.lo = this.hi;
+                    this.hi = tmp;
+                    n -= 32;
+                }
+                if (n === 0) {
+                    return this;
+                }
+                m = 32 - n;
+                tmp = (this.hi << n) + (this.lo >>> m);
+                this.lo = (this.lo << n) + (this.hi >>> m);
+                this.hi = tmp;
+                return this;
+            },
+            toString: function() {
+                var hex, o;
+                hex = function(n) {
+                    return ("00" + n.toString(16)).slice(-2);
+                };
+                o = function(n) {
+                    return hex(n & 255) + hex(n >>> 8) + hex(n >>> 16) + hex(n >>> 24);
+                };
+                return function() {
+                    return o(this.lo) + o(this.hi);
+                };
+            }()
+        };
+        zeros = function(k) {
+            var i, z = [];
+            for (i = 0; i < k; i += 1) {
+                z[i] = new L();
+            }
+            return z;
+        };
+        State = function(s) {
+            var fn = function(x, y) {
+                return fn.array[x % 5 + 5 * (y % 5)];
+            };
+            fn.array = s ? s : zeros(25);
+            fn.clone = function() {
+                return new State(fn.array.map(L.clone));
+            };
+            return fn;
+        };
+        permute = [ 0, 10, 20, 5, 15, 16, 1, 11, 21, 6, 7, 17, 2, 12, 22, 23, 8, 18, 3, 13, 14, 24, 9, 19, 4 ];
+        RC = "0,1;0,8082;z,808A;z,yy;0,808B;0,y0001;z,y8081;z,8009;0,8A;0,88;0,y8009;0,y000A;0,y808B;z,8B;z,8089;z,8003;z,8002;z,80;0,800A;z,y000A;z,y8081;z,8080;0,y0001;z,y8008".replace(/z/g, "80000000").replace(/y/g, "8000").split(";").map(function(str) {
+            var k = str.split(",");
+            return new L(parseInt(k[1], 16), parseInt(k[0], 16));
+        });
+        r = [ 0, 1, 62, 28, 27, 36, 44, 6, 55, 20, 3, 10, 43, 25, 39, 41, 45, 15, 21, 8, 18, 2, 61, 56, 14 ];
+        keccak_f = function() {
+            var x, y, i, b, C, D, round, last;
+            for (round = 0; round < 24; round += 1) {
+                C = zeros(5);
+                for (x = 0; x < 5; x += 1) {
+                    for (y = 0; y < 5; y += 1) {
+                        C[x].xor(state(x, y));
+                    }
+                }
+                D = C.map(L.clone);
+                D = D.concat(D.splice(0, 1));
+                for (x = 0; x < 5; x += 1) {
+                    D[x].circ(1).xor(C[(x + 4) % 5]);
+                }
+                for (x = 0; x < 5; x += 1) {
+                    for (y = 0; y < 5; y += 1) {
+                        state(x, y).xor(D[x]);
+                    }
+                }
+                for (x = 0; x < 5; x += 1) {
+                    for (y = 0; y < 5; y += 1) {
+                        state(x, y).circ(r[5 * y + x]);
+                    }
+                }
+                last = state.array.slice(0);
+                for (i = 0; i < 25; i += 1) {
+                    state.array[permute[i]] = last[i];
+                }
+                b = state.clone();
+                for (x = 0; x < 5; x += 1) {
+                    for (y = 0; y < 5; y += 1) {
+                        state(x, y).xor(b(x + 1, y).not().and(b(x + 2, y)));
+                    }
+                }
+                state(0, 0).xor(RC[round]);
+            }
+        };
+        return function(m) {
+            state = new State();
+            if (m.length % 68 === 67) {
+                m += "老";
+            } else {
+                m += "";
+                while (m.length % 68 !== 67) {
+                    m += "\x00";
+                }
+                m += "耀";
+            }
+            var b, k;
+            for (b = 0; b < m.length; b += 68) {
+                for (k = 0; k < 68; k += 4) {
+                    state.array[k / 4].xor(new L(m.charCodeAt(b + k) + m.charCodeAt(b + k + 1) * 65536, m.charCodeAt(b + k + 2) + m.charCodeAt(b + k + 3) * 65536));
+                }
+                keccak_f();
+            }
+            return state.array.slice(0, 4).join("");
+        };
+    }();
     function uuid1(o, c, m, n) {
         var s = rng(), e = [ s[0] | 1, s[1], s[2], s[3], s[4], s[5] ], k = (s[6] << 8 | s[7]) & 16383, x = 0, y = 0, i = 0, z = 6, b = [], t, h, d;
         o = o || e;
@@ -768,6 +901,7 @@ A collection of hash algorithms. MD5, SHA1, SHA3, UUID ver.1, 2, 3, 4, etc.
         sha1: sha1,
         sha256: sha256,
         sha512: sha512,
+        sha3: sha3,
         uuid1: uuid1,
         uuid3: uuid3,
         uuid4: uuid4,

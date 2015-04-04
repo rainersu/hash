@@ -20,7 +20,7 @@ function(
 ) {'use strict';
 
 var b64pad  = '',     /* 指定 base-64 编码格式填充字符 */
-	chrsz   = 8;      /* 为 8 则认定为 ASCII 字符集。为 16 则认定为 Unicode 字符集 */
+	chrsz   =  8;     /* 为 8 则认定为 ASCII 字符集。为 16 则认定为 Unicode 字符集 */
 
 function binb2str (b) {
 	var c = chrsz,

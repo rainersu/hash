@@ -1,48 +1,6 @@
-/* keccak.js
- * A Javascript implementation of the Keccak SHA-3 candidate from Bertoni,
- * Daemen, Peeters and van Assche. This version is not optimized with any of 
- * the tricks specifically mentioned in the spec, and was intended as a first 
- * implementation to help in understanding the specification. It uses a long
- * integer class L to handle double arithmetic; the class is stateful so that
- * constructors don't slow down the algorithm.
- * 
- * This file implements Keccak[1088, 512, 32], their proposed candidate for 
- * SHA3-256. This implementation operates on Javascript strings, interpreted as 
- * UTF-16LE encoded (i.e. "\u1234\u5678" --> [0x34, 0x12, 0x78, 0x56], and thus 
- * is restricted to hash byte strings which are a multiple of 2 bytes in 
- * length.
- * 
- * The following test vectors are given on the Keccak NIST CD:
- *     ShortMsgKAT_256.txt
- *         Len = 0
- *         Msg = 00
- *         MD = C5D2460186F7233C927E7DB2DCC703C0E500B653CA82273B7BFAD8045D85A470
- *         ...
- *         Len = 16
- *         Msg = 41FB
- *         MD = A8EACEDA4D47B3281A795AD9E1EA2122B407BAF9AABCB9E18B5717B7873537D2
- *         ...
- *         Len = 2000
- *         Msg = B3C5E74B69933C2533106C563B4CA20238F2B6E675E8681E34A389894785BDADE59652D4A73D80A5C85BD454FD1E9FFDAD1C3815F5038E9EF432AAC5C3C4FE840CC370CF86580A6011778BBEDAF511A51B56D1A2EB68394AA299E26DA9ADA6A2F39B9FAFF7FBA457689B9C1A577B2A1E505FDF75C7A0A64B1DF81B3A356001BF0DF4E02A1FC59F651C9D585EC6224BB279C6BEBA2966E8882D68376081B987468E7AED1EF90EBD090AE825795CDCA1B4F09A979C8DFC21A48D8A53CDBB26C4DB547FC06EFE2F9850EDD2685A4661CB4911F165D4B63EF25B87D0A96D3DFF6AB0758999AAD214D07BD4F133A6734FDE445FE474711B69A98F7E2B
- *         MD = C6D86CC4CCEF3BB70BF7BFDDEC6A9A04A0DD0A68FE1BF51C14648CF506A03E98
- * 
- * The corresponding Javascript code is:
- *     keccak("");
- *         "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
- *     keccak("\ufb41");
- *         "a8eaceda4d47b3281a795ad9e1ea2122b407baf9aabcb9e18b5717b7873537d2"
- *     keccak("\uC5B3\u4BE7\u9369\u253C\u1033\u566C\u4C3B\u02A2\uF238\uE6B6\uE875\u1E68\uA334\u8989\u8547\uADBD\u96E5\uD452\u3DA7\uA580\u5BC8\u54D4\u1EFD\uFD9F\u1CAD\u1538\u03F5\u9E8E\u32F4\uC5AA\uC4C3\u84FE\uC30C\uCF70\u5886\u600A\u7711\uBE8B\uF5DA\uA511\u561B\uA2D1\u68EB\u4A39\u99A2\u6DE2\uADA9\uA2A6\u9BF3\uAF9F\uFBF7\u57A4\u9B68\u1A9C\u7B57\u1E2A\u5F50\u75DF\uA0C7\u4BA6\uF81D\u3A1B\u6035\uBF01\uF40D\u2AE0\uC51F\u659F\u9D1C\u5E58\u22C6\uB24B\uC679\uBABE\u6629\u88E8\u682D\u6037\uB981\u4687\u7A8E\u1EED\u0EF9\u09BD\uE80A\u7925\uDC5C\uB4A1\u9AF0\u9C97\uFC8D\uA421\u8A8D\uCD53\u26BB\uDBC4\u7F54\u6EC0\u2FFE\u5098\uD2ED\u5A68\u6146\u49CB\uF111\uD465\u3EB6\u5BF2\uD087\u6DA9\uFF3D\uB06A\u8975\uAA99\u14D2\u7BD0\uF1D4\uA633\u4F73\u44DE\uE45F\u7174\u691B\u8FA9\u2B7E");
- *         "c6d86cc4ccef3bb70bf7bfddec6a9a04a0dd0a68fe1bf51c14648cf506a03e98"
- * 
- * This function was written by Chris Drost of drostie.org, and he hereby
- * dedicates it into the public domain: it has no copyright. It is provided with
- * NO WARRANTIES OF ANY KIND. I do humbly request that you provide me some sort
- * of credit if you use it; but I leave that choice up to you.
- */
+define(function () {'use strict';
 
-/*jslint white: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, regexp: true, newcap: true, immed: true, strict: true, maxerr: 50, indent: 4 */
-"use strict";
-var keccak = (function () {
+var sha3 = (function () {
 	var state, State, L, permute, zeros, RC, r, keccak_f;
 	L = function (lo, hi) {
 		this.lo = lo ? lo : 0;
@@ -190,3 +148,6 @@ var keccak = (function () {
 		return state.array.slice(0, 4).join("");
 	};
 }());
+
+return sha3;
+});
