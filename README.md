@@ -11,7 +11,7 @@ Target environments
 Features
 --------
 
-- RFC4122 UUID version 1, 2, 3, 4.
+- RFC4122 UUID version 1, 3, 4, 5.
 - MD5, RIPEMD-160.
 - SHA-1, SHA2-256, SHA2-512, SHA3-256(Keccak).
 - BLAKE, Blue Midnight Wish, CubeHash, Shabal, Skein, etc.
@@ -35,7 +35,7 @@ Including in a browser:
 ```html
 <script type='text/javascript' src='/path/to/sumi-hash-1.0.0.min.js'></script>
 <script type='text/javascript'>
-console.log(sumiHash.md5('abs', 'key'));
+console.log(sumiHash.md5('abs', 'key'));  // 8c2c9d4bf3277c688e72a2b020ada7b1
 </script>
 ```
 
@@ -43,7 +43,11 @@ As a module that works with AMD(e.g., [RequireJS](http://requirejs.org/)):
 
 ```JavaScript
 define(['/path/to/sumi-hash-1.0.0.min.js'], function(Hash) {
+
 	console.log(Hash.sha3('admin@me.com'));
+
+	// 96bbfb5f4e6eb42cc53c37fb9dd54ea213fc4e38e4750b757cff29c330367ab9
+
 });
 ```
 
@@ -52,6 +56,8 @@ Including in a CommonJS environment(e.g., [Node.js](https://nodejs.org/)):
 ```JavaScript
 var Hash = require('/path/to/sumi-hash');
 console.log(Hash.uuid3('ns:DNS', 'php.net'));
+
+// 11a38b9a-b3da-360f-9353-a5a725514269
 ```
 
 Build from source

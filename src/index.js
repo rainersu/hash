@@ -70,5 +70,7 @@ shell.Hash = shell.Hash || Hash; cp(Hash, {
 	keccak    : sha3
 });
 
+
+
 return Hash;
 });
