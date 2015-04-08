@@ -41,7 +41,7 @@ console.log(sumiHash.md5('abs', 'key'));
 
 As a module that works with AMD(e.g., [RequireJS](http://requirejs.org/)):
 
-```bash
+```JavaScript
 define(['/path/to/sumi-hash-1.0.0.min.js'], function(Hash) {
 	console.log(Hash.sha3('admin@me.com'));
 });
@@ -49,7 +49,7 @@ define(['/path/to/sumi-hash-1.0.0.min.js'], function(Hash) {
 
 Including in a CommonJS environment(e.g., [Node.js](https://nodejs.org/)):
 
-```bash
+```JavaScript
 var Hash = require('/path/to/sumi-hash');
 console.log(Hash.uuid3('ns:DNS', 'php.net'));
 ```
@@ -59,7 +59,7 @@ Build from source
 
 First, you need to have [Node.js](https://nodejs.org/) and [Grunt](http://gruntjs.com/) installed.
 
-```bash
+```Shell
 $ git clone git@github.com:rainersu/hash.git
 $ npm install -g grunt-cli
 $ cd hash
@@ -72,14 +72,14 @@ It provides compiled JS (`sumi-hash.*`), as well as compiled and minified JS (`s
 Running demos for testing
 -------------------------
 
-```bash
+```Shell
 $ grunt test
 ```
 
 Build & running documentation locally
 -------------------------------------
 
-```bash
+```Shell
 $ grunt help
 ```
 
