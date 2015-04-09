@@ -39,7 +39,7 @@
 <a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
-<li>RFC4122 UUID version 1, 2, 3, 4.</li>
+<li>RFC4122 UUID version 1, 3, 4, 5.</li>
 <li>MD5, RIPEMD-160.</li>
 <li>SHA-1, SHA2-256, SHA2-512, SHA3-256(Keccak).</li>
 <li>BLAKE, Blue Midnight Wish, CubeHash, Shabal, Skein, etc.</li>
@@ -52,7 +52,7 @@
 <p>Four quick start options are available:</p>
 
 <ul>
-<li><a href="https://github.com/rainersu/hash/archive/v1.0.0.zip">Download the latest release</a></li>
+<li><a href="https://github.com/rainersu/hash/archive/v1.0.1.zip">Download the latest release</a></li>
 <li>Clone the repo: <code>git clone https://github.com/rainersu/hash.git</code>
 </li>
 <li>Install with <a href="http://bower.io">Bower</a>: <code>bower install sumi-hash</code>
@@ -66,28 +66,34 @@
 
 <p>Including in a browser:</p>
 
-<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">script</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">'</span>text/javascript<span class="pl-pds">'</span></span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">'</span>/path/to/sumi-hash-1.0.0.min.js<span class="pl-pds">'</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
+<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">script</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">'</span>text/javascript<span class="pl-pds">'</span></span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">'</span>/path/to/sumi-hash-1.0.1.min.js<span class="pl-pds">'</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
 <span class="pl-s1">&lt;<span class="pl-ent">script</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">'</span>text/javascript<span class="pl-pds">'</span></span>&gt;</span>
-<span class="pl-s1"><span class="pl-en">console</span><span class="pl-c1">.log</span>(sumiHash.md5(<span class="pl-s"><span class="pl-pds">'</span>abs<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>key<span class="pl-pds">'</span></span>));</span>
+<span class="pl-s1"><span class="pl-en">console</span><span class="pl-c1">.log</span>(sumiHash.md5(<span class="pl-s"><span class="pl-pds">'</span>abs<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>key<span class="pl-pds">'</span></span>));  <span class="pl-c">// 8c2c9d4bf3277c688e72a2b020ada7b1</span></span>
 <span class="pl-s1">&lt;/<span class="pl-ent">script</span>&gt;</span></pre></div>
 
 <p>As a module that works with AMD(e.g., <a href="http://requirejs.org/">RequireJS</a>):</p>
 
-<div class="highlight highlight-bash"><pre>define([<span class="pl-s"><span class="pl-pds">'</span>/path/to/sumi-hash-1.0.0.min.js<span class="pl-pds">'</span></span>], function(Hash) {
-    console.log(Hash.sha3(<span class="pl-s"><span class="pl-pds">'</span>admin@me.com<span class="pl-pds">'</span></span>))<span class="pl-k">;</span>
-})<span class="pl-k">;</span></pre></div>
+<div class="highlight highlight-JavaScript"><pre>define([<span class="pl-s"><span class="pl-pds">'</span>/path/to/sumi-hash-1.0.1.min.js<span class="pl-pds">'</span></span>], <span class="pl-k">function</span>(<span class="pl-smi">Hash</span>) {
+
+    <span class="pl-en">console</span><span class="pl-c1">.log</span>(Hash.sha3(<span class="pl-s"><span class="pl-pds">'</span>admin@me.com<span class="pl-pds">'</span></span>));
+
+    <span class="pl-c">// 96bbfb5f4e6eb42cc53c37fb9dd54ea213fc4e38e4750b757cff29c330367ab9</span>
+
+});</pre></div>
 
 <p>Including in a CommonJS environment(e.g., <a href="https://nodejs.org/">Node.js</a>):</p>
 
-<div class="highlight highlight-bash"><pre>var Hash = require(<span class="pl-s"><span class="pl-pds">'</span>/path/to/sumi-hash<span class="pl-pds">'</span></span>)<span class="pl-k">;</span>
-console.log(Hash.uuid3(<span class="pl-s"><span class="pl-pds">'</span>ns:DNS<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>php.net<span class="pl-pds">'</span></span>))<span class="pl-k">;</span></pre></div>
+<div class="highlight highlight-JavaScript"><pre><span class="pl-k">var</span> Hash <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>/path/to/sumi-hash<span class="pl-pds">'</span></span>);
+<span class="pl-en">console</span><span class="pl-c1">.log</span>(Hash.uuid3(<span class="pl-s"><span class="pl-pds">'</span>ns:DNS<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>php.net<span class="pl-pds">'</span></span>));
+
+<span class="pl-c">// 11a38b9a-b3da-360f-9353-a5a725514269</span></pre></div>
 
 <h2>
 <a id="build-from-source" class="anchor" href="#build-from-source" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build from source</h2>
 
 <p>First, you need to have <a href="https://nodejs.org/">Node.js</a> and <a href="http://gruntjs.com/">Grunt</a> installed.</p>
 
-<div class="highlight highlight-bash"><pre>$ git clone git@github.com:rainersu/hash.git
+<div class="highlight highlight-Shell"><pre>$ git clone git@github.com:rainersu/hash.git
 $ npm install -g grunt-cli
 $ <span class="pl-c1">cd</span> <span class="pl-c1">hash</span>
 $ npm install
@@ -98,12 +104,12 @@ $ grunt</pre></div>
 <h2>
 <a id="running-demos-for-testing" class="anchor" href="#running-demos-for-testing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running demos for testing</h2>
 
-<div class="highlight highlight-bash"><pre>$ grunt <span class="pl-c1">test</span></pre></div>
+<div class="highlight highlight-Shell"><pre>$ grunt <span class="pl-c1">test</span></pre></div>
 
 <h2>
 <a id="build--running-documentation-locally" class="anchor" href="#build--running-documentation-locally" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build &amp; running documentation locally</h2>
 
-<div class="highlight highlight-bash"><pre>$ grunt <span class="pl-c1">help</span></pre></div>
+<div class="highlight highlight-Shell"><pre>$ grunt <span class="pl-c1">help</span></pre></div>
 
 <p>Sorry, the documentation is currently offered only in the Chinese language. Do you have time to help me with some Chinese - English translations?</p>
 
