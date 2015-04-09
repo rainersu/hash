@@ -22,7 +22,7 @@ Quick start
 
 Four quick start options are available:
 
-- [Download the latest release](https://github.com/rainersu/hash/archive/v1.0.0.zip)
+- [Download the latest release](https://github.com/rainersu/hash/archive/v1.0.1.zip)
 - Clone the repo: `git clone https://github.com/rainersu/hash.git`
 - Install with [Bower](http://bower.io): `bower install sumi-hash`
 - Install with [npm](https://www.npmjs.com): `npm install sumi-hash`
@@ -33,7 +33,7 @@ Example use
 Including in a browser:
 
 ```html
-<script type='text/javascript' src='/path/to/sumi-hash-1.0.0.min.js'></script>
+<script type='text/javascript' src='/path/to/sumi-hash-1.0.1.min.js'></script>
 <script type='text/javascript'>
 console.log(sumiHash.md5('abs', 'key'));  // 8c2c9d4bf3277c688e72a2b020ada7b1
 </script>
@@ -42,7 +42,7 @@ console.log(sumiHash.md5('abs', 'key'));  // 8c2c9d4bf3277c688e72a2b020ada7b1
 As a module that works with AMD(e.g., [RequireJS](http://requirejs.org/)):
 
 ```JavaScript
-define(['/path/to/sumi-hash-1.0.0.min.js'], function(Hash) {
+define(['/path/to/sumi-hash-1.0.1.min.js'], function(Hash) {
 
 	console.log(Hash.sha3('admin@me.com'));
 

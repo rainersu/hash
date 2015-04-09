@@ -1,5 +1,5 @@
 /*!
-sumi-hash v1.0.0
+sumi-hash v1.0.1
 https://github.com/rainersu/hash
 A collection of hash algorithms. MD5, SHA1, SHA2, SHA3, RFC4122 UUID ver.1, 2, 3, 4, etc.
 (c) 2015 Rainer Su( rainersu@foxmail.com | http://cn.linkedin.com/in/rainersu | QQ: 2627001536 )
@@ -16,8 +16,11 @@ A collection of hash algorithms. MD5, SHA1, SHA2, SHA3, RFC4122 UUID ver.1, 2, 3
     }
 })(this, function() {
     var undefined = void 0;
-    var NaN = 0 / 0;
     var object = Object;
+    var array = Array;
+    var string = String;
+    var math = Math;
+    var NaN = 0 / 0;
     var hasOP = object.prototype.hasOwnProperty;
     function cp(d, o) {
         for (var m in o) if (hasOP.call(o, m)) d[m] = o[m];
@@ -28,12 +31,9 @@ A collection of hash algorithms. MD5, SHA1, SHA2, SHA3, RFC4122 UUID ver.1, 2, 3
     var Hash = {
         namespaces: ns
     };
-    var math = Math;
     var ceil = math.ceil;
     var log = math.log;
     var floor = math.floor;
-    var array = Array;
-    var string = String;
     var fromCC = string.fromCharCode;
     function add(x, y) {
         var l = (x & 65535) + (y & 65535), m = (x >> 16) + (y >> 16) + (l >> 16);
