@@ -164,10 +164,9 @@ A collection of hash algorithms. MD5, SHA1, SHA2, SHA3, RFC4122 UUID ver.1, 2, 3
     }
     function rng() {
         var b = array(16), t = shell.crypto || shell.msCrypto, a = shell.Uint8Array, i = 0, r;
-        t = t && t.getRandomValues;
-        if (t && a) {
+        if (t && t.getRandomValues && a) {
             b = new a(16);
-            t(b);
+            t.getRandomValues(b);
         } else for (;i < 16; i++) {
             if ((i & 3) === 0) r = Math.random() * 4294967296;
             b[i] = r >>> ((i & 3) << 3) & 255;

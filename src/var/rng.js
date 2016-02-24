@@ -15,10 +15,9 @@ function rng () {
 		a = shell.Uint8Array,
 		i = 0,
 		r;
-	t = t && t.getRandomValues;
-	if (t && a) {
+	if (t && t.getRandomValues && a) {
 		b = new a(16);
-		t(b);
+		t.getRandomValues(b);
 	}
 	else for (; i < 16; i++) {
 		if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
