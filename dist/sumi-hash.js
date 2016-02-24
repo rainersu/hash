@@ -1488,7 +1488,6 @@ A collection of hash algorithms. MD5, SHA1, SHA2, SHA3, RFC4122 UUID ver.1, 2, 3
             return hexCase(state.slice(0, 8).map(output_fn).join(""));
         };
     }();
-    shell.Hash = shell.Hash || Hash;
     cp(Hash, {
         md5: md5,
         rmd160: rmd160,

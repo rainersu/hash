@@ -49,7 +49,7 @@ function(
 	keccak32
 ) {'use strict';
 
-shell.Hash = shell.Hash || Hash; cp(Hash, {
+cp(Hash, {
 	md5       : md5,
 	rmd160    : rmd160,
 	sha1      : sha1,
